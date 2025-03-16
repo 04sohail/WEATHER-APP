@@ -144,14 +144,14 @@ class LoginFormHandler extends FormHandler {
     private emailInput: HTMLInputElement;
     private passwordInput: HTMLInputElement;
     private form: HTMLFormElement;
-    private APIInstance: APIService;
+    private APIInstance: UserApiService;
     constructor() {
         super();
         this.form = document.getElementById('login-form-element') as HTMLFormElement;
         this.emailInput = document.getElementById('login-email') as HTMLInputElement;
         this.passwordInput = document.getElementById('login-password') as HTMLInputElement;
         this.initializeEventListeners();
-        this.APIInstance = new APIService();
+        this.APIInstance = new UserApiService();
     }
 
     private initializeEventListeners(): void {
@@ -222,12 +222,11 @@ class LoginFormHandler extends FormHandler {
                 alert("SORRY NO USER FOUND")
             }
             else {
-                const user = API_RESPONSE[0];
-                const location: Object | undefined = await fetchUserLocation();
-                const userData: Object = { user, "location": location };
-                sessionStorage.setItem("user", JSON.stringify(userData));
+                const userData = API_RESPONSE[0];
                 console.log(userData);
                 window.location.href = "main.html";
+                sessionStorage.setItem("user", JSON.stringify(userData));
+                debugger;
             }
         }
     }
@@ -241,7 +240,7 @@ class SignupFormHandler extends FormHandler {
     private confirmPasswordInput: HTMLInputElement;
     private termsCheckbox: HTMLInputElement;
     private form: HTMLFormElement;
-    private APIInstance: APIService;
+    private APIInstance: UserApiService;
     constructor() {
         super();
         this.form = document.getElementById('signup-form-element') as HTMLFormElement;
@@ -252,7 +251,7 @@ class SignupFormHandler extends FormHandler {
         this.confirmPasswordInput = document.getElementById('confirm-password') as HTMLInputElement;
         this.termsCheckbox = document.getElementById('terms') as HTMLInputElement;
         this.initializeEventListeners();
-        this.APIInstance = new APIService();
+        this.APIInstance = new UserApiService();
     }
 
     private initializeEventListeners(): void {
@@ -472,41 +471,3 @@ document.addEventListener('DOMContentLoaded', () => {
     new LoginFormHandler();
     new SignupFormHandler();
 });
-
-// Getting All The Sign Up Fields
-const signupfields: NodeListOf<HTMLInputElement> = document.querySelectorAll(".signup") as NodeListOf<HTMLInputElement>;
-console.log(signupfields);
-
-
-
-// Getting users location //
-class UserLocation {
-    static async getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
-        if (!navigator.geolocation) {
-            throw new Error("Geolocation is not supported by your browser.");
-        }
-
-        return new Promise((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    resolve({ latitude, longitude });
-                },
-                (error) => {
-                    reject(new Error(`Failed to retrieve location: ${error.message}`));
-                }
-            );
-        });
-    }
-}
-
-// Usage Example with async/await
-const fetchUserLocation = async () => {
-    try {
-        const location = await UserLocation.getCurrentLocation();
-        return location;
-        console.log(`User's location: Latitude ${location.latitude}, Longitude ${location.longitude}`);
-    } catch (error) {
-        console.error((error as Error).message);
-    }
-};

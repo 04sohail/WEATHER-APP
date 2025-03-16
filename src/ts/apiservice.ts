@@ -1,22 +1,9 @@
-class APIService {
+class UserApiService {
     API_URL: string = "http://localhost:3000";
     API_URL_USERS: string = "http://localhost:3000/users"
-    LOADING_SCREEN: HTMLElement = document.querySelector(".fullScreen") as HTMLElement;
-    // GETTING USERS FROM API //
-    async GetUser(endPoint: string): Promise<User | undefined> {
-        try {
-            this.LOADING_SCREEN.style.display = "block";
-            const API_response = await fetch(`${this.API_URL}/${endPoint}`);
-            if (API_response.ok) {
-                this.LOADING_SCREEN.style.display = "none";
-            }
-            const users: User = await API_response.json();
-            return users;
-        } catch (error) {
-            console.error(error);
-            return undefined;
-        }
-    };
+    LOADING_SCREEN: HTMLElement = document.querySelector(".fullScreen") as HTMLDivElement;
+    WEATHER_API_KEY: string = "492893deed7dcba52a4ea95768802f3a";
+    // GET SINGLE USER
     async GetSingleUser(endPoint: string): Promise<Object[] | undefined> {
         try {
             this.LOADING_SCREEN.style.display = "block";
@@ -50,65 +37,80 @@ class APIService {
             console.error(error);
         }
     };
-    // PATCHING USER TO API //
-    async PatchUser(user: User, endPoint: string) {
-        console.log(user);
-        try {
-            debugger
-            this.LOADING_SCREEN.style.display = "block";
-            const API_RESPONSE = await fetch(`${this.API_URL_USERS}/${endPoint}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(user),
-            });
-            if (API_RESPONSE.ok) {
-                this.LOADING_SCREEN.style.display = "none";
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
-    // PATCHING CUSTOMER TO API //
-    async CustomerPatchUser(user: User, endPoint: string) {
-        console.log(user);
-        try {
-            debugger
-            this.LOADING_SCREEN.style.display = "block";
-            const API_RESPONSE = await fetch(`${this.API_URL_USERS}/${endPoint}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(user),
-            });
-            if (API_RESPONSE.ok) {
-                this.LOADING_SCREEN.style.display = "none";
-                sessionStorage.clear()
-                sessionStorage.setItem("loggedInCustomer", JSON.stringify(user));
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
-    // DELETING USER FROM API //
-    async DeleteUser(endPoint: string) {
-        console.log(endPoint);
-        debugger;
-        try {
-            this.LOADING_SCREEN.style.display = "block";
-            console.log(this.API_URL_USERS, endPoint);
+}
 
-            debugger
-            const API_RESPONSE = await fetch(`${this.API_URL_USERS}/${endPoint}`, {
-                method: "DELETE",
-            });
-            if (API_RESPONSE.ok) {
-                this.LOADING_SCREEN.style.display = "none";
+// GETTING USER LOCATION //
+class UserLocation extends UserApiService {
+    // GETTING CURRENT COORDINATES //
+    static async getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
+        if (!navigator.geolocation) {
+            throw new Error("Geolocation is not supported by your browser.");
+        }
+        return new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    resolve({ latitude, longitude });
+                },
+                (error) => {
+                    reject(new Error(`Failed to retrieve location: ${error.message}`));
+                }
+            );
+        });
+    }
+    // GETTING CITY FROM COORDINATES //
+    async getCityFromCoords(lat: number, lon: number): Promise<string | undefined> {
+        const url = `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${this.WEATHER_API_KEY}`;
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            if (data && data.length > 0) {
+                console.log(data[0].name);
+                const city = data[0].name;
+                return city;
+            } else {
+                throw new Error("City not found");
             }
         } catch (error) {
-            console.error(error);
+            console.error("Error fetching city:", error);
+            // return "Error fetching city";
         }
     };
+}
+
+class Weather extends UserApiService {
+
+    // CURRENT WEATHER //
+    async GetWeather(lat: number, lon: number, ): Promise<JSON | undefined> {
+        try {
+            this.LOADING_SCREEN.style.display = "block";
+            const API_response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${this.WEATHER_API_KEY}`);
+            if (API_response.ok) {
+                this.LOADING_SCREEN.style.display = "none";
+            }
+            const weather: JSON = await API_response.json();
+            return weather;
+        } catch (error) {
+            console.error(error);
+            return undefined;
+        }
+    };
+
+    // GET 5 DAYS FORECAST 
+    async GetFiveDayForecast(lat: number, lon: number): Promise<JSON | undefined> {
+        const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${this.WEATHER_API_KEY}`
+        try {
+            this.LOADING_SCREEN.style.display = "block";
+            const API_response = await fetch(url);
+            if (API_response.ok) {
+                this.LOADING_SCREEN.style.display = "none";
+            }
+            const weather: JSON = await API_response.json();
+            return weather;
+        } catch (error) {
+            console.error(error);
+            return undefined;
+        }
+    };
+
 }

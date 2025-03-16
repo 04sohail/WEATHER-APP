@@ -1,9 +1,9 @@
 const getStartedBtn = document.getElementById('getStartedBtn');
 
 if (getStartedBtn) {
-    getStartedBtn.addEventListener('click', (): void => {
-      window.location.href = "login.html"
-    });
+  getStartedBtn.addEventListener('click', (): void => {
+    window.location.href = "login.html"
+  });
 }
 
 // Add animation classes for the blobs
