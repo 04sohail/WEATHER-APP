@@ -7,9 +7,24 @@
   <title>Strom Bloom</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="icon" href="../assets/img/logo.png" type="image/x-icon">
+  <link rel="stylesheet" href="./css/index.css">
 </head>
 
 <body class="min-h-screen bg-sky-200">
+  <!-- LOADING SCREEN  -->
+  <div class="fullScreen">
+    <div class="middle">
+      <div class="bar bar1"></div>
+      <div class="bar bar2"></div>
+      <div class="bar bar3"></div>
+      <div class="bar bar4"></div>
+      <div class="bar bar5"></div>
+      <div class="bar bar6"></div>
+      <div class="bar bar7"></div>
+      <div class="bar bar8"></div>
+    </div>
+  </div>
+
   <!-- Navbar -->
   <header class="bg-white shadow-lg py-3 flex items-center justify-between">
     <!-- Logo and Search Bar -->
@@ -69,79 +84,75 @@
   <main class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-7xl mx-auto">
     <!-- Left Card: Time and Location -->
     <div class="bg-sky-100 text-blue-900 rounded-lg p-4 card-shadow theme-transition" id="time-location-card">
-      <h2 class="text-xl font-bold mb-2">New York</h2>
-      <div class="text-6xl font-bold mb-1">14:25</div>
-      <div class="text-sm text-blue-600 theme-transition" id="date-text">Tuesday, 11 Mar</div>
+      <h2 class="text-xl font-bold mb-2" id="user-city"></h2>
+      <div class="text-6xl font-bold mb-1" id="user-time">14:25</div>
+      <div class="text-sm text-blue-600 theme-transition" id="day-and-date">Tuesday, 11 Mar</div>
     </div>
-
     <!-- Right Card: Current Weather -->
     <div class="bg-sky-100 text-blue-900 rounded-lg p-4 flex card-shadow theme-transition" id="current-weather-card">
       <div class="flex-1">
         <div class="flex items-baseline">
-          <span class="text-6xl font-bold">18</span>
+          <span class="text-6xl font-bold main-temp">18</span>
           <span class="text-3xl">°C</span>
         </div>
-        <div class="text-sm text-blue-600 mb-4 theme-transition" id="feels-like-text">Feels like: 16°C</div>
-
+        <div class="text-sm text-blue-600 mb-4 theme-transition" id="feels-like-text">Feels like: <span
+            class="main-temp-feels-like"></span></div>
         <div class="grid grid-cols-2 gap-2 text-sm">
           <div>
             <div class="font-bold">Sunrise</div>
-            <div>06:15 AM</div>
+            <div class="main-temp-sunrise"></div>
           </div>
           <div>
             <div class="font-bold">Sunset</div>
-            <div>18:05 PM</div>
+            <div class="main-temp-sunset"></div>
           </div>
         </div>
       </div>
-
       <div class="flex flex-col justify-between text-right">
         <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mb-4">
           <div class="text-right">
-            <div>45%</div>
+            <div class="main-temp-humidity"></div>
             <div class="text-blue-600 theme-transition secondary-text">Humidity</div>
           </div>
           <div class="text-right">
-            <div>5km/h</div>
+            <div class="main-temp-wind-speed"></div>
             <div class="text-blue-600 theme-transition secondary-text">Wind Speed</div>
           </div>
           <div class="text-right">
-            <div>1013hPa</div>
+            <div class="main-temp-pressure"></div>
             <div class="text-blue-600 theme-transition secondary-text">Pressure</div>
           </div>
           <div class="text-right">
-            <div>4</div>
-            <div class="text-blue-600 theme-transition secondary-text">UV</div>
+            <div class="main-temp-visibility"></div>
+            <div class="text-blue-600 theme-transition secondary-text">Visibility</div>
           </div>
         </div>
-
         <div class="text-xl font-bold">Partly Cloudy</div>
       </div>
     </div>
-
     <!-- 5 Days Forecast -->
     <div class="bg-sky-100 text-blue-900 rounded-lg p-4 card-shadow theme-transition" id="forecast-card">
       <h3 class="text-lg font-bold mb-2">5 Days Forecast:</h3>
       <div class="space-y-2">
         <div class="flex justify-between items-center">
-          <span>16°C</span>
-          <span class="text-blue-600 theme-transition secondary-text">Wednesday, 12 Mar</span>
+          <span class="five-day-forecast-temp"></span>
+          <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
         </div>
         <div class="flex justify-between items-center">
-          <span>19°C</span>
-          <span class="text-blue-600 theme-transition secondary-text">Thursday, 13 Mar</span>
+          <span class="five-day-forecast-temp"></span>
+          <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
         </div>
         <div class="flex justify-between items-center">
-          <span>21°C</span>
-          <span class="text-blue-600 theme-transition secondary-text">Friday, 14 Mar</span>
+          <span class="five-day-forecast-temp"></span>
+          <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
         </div>
         <div class="flex justify-between items-center">
-          <span>17°C</span>
-          <span class="text-blue-600 theme-transition secondary-text">Saturday, 15 Mar</span>
+          <span class="five-day-forecast-temp"></span>
+          <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
         </div>
         <div class="flex justify-between items-center">
-          <span>15°C</span>
-          <span class="text-blue-600 theme-transition secondary-text">Sunday, 16 Mar</span>
+          <span class="five-day-forecast-temp"></span>
+          <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
         </div>
       </div>
     </div>
@@ -150,6 +161,7 @@
     <div class="bg-sky-100 text-blue-900 rounded-lg p-4 card-shadow theme-transition" id="hourly-card">
       <h3 class="text-lg font-bold mb-2">Hourly Forecast:</h3>
       <div class="grid grid-cols-5 gap-2">
+
         <!-- 15:00 -->
         <div class="bg-sky-300 rounded-lg p-2 text-center theme-transition hourly-item">
           <div class="font-bold mb-1">15:00</div>
@@ -187,7 +199,8 @@
       </div>
     </div>
   </main>
-
+  <script src="../dist/src/ts/apiservice.js"></script>
+  <script src="../dist/src/ts/helping.js"></script>
   <script src="../dist/src/ts/main.js"></script>
 </body>
 
