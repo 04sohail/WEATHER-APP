@@ -1,6 +1,11 @@
-const API_SERVICE = new UserApiService();
+const USER = sessionStorage.getItem("user")
+if (!USER) {
+    showAlert("user-not-found")
+}
+// API INSTANCES
 const WEATHER_SERVICE = new Weather();
 const USER_LOCATION = new UserLocation();
+const GET_LAT_LON = new getLatAndLon();
 // ALL USER ELEMENTS
 const USER_CITY = document.getElementById('user-city') as HTMLElement;
 const USER_TIME = document.getElementById('user-time') as HTMLDivElement;
@@ -15,8 +20,21 @@ const MAIN_TEMP_HUMIDITY = document.querySelector('.main-temp-humidity') as HTML
 const MAIN_TEMP_WIND_SPEED = document.querySelector('.main-temp-wind-speed') as HTMLDivElement;
 const MAIN_TEMP_PRESSURE = document.querySelector('.main-temp-pressure') as HTMLDivElement;
 const MAIN_TEMP_VISIBILITY = document.querySelector('.main-temp-visibility') as HTMLDivElement;
+const MAIN_TEMP_DESCRIPTION = document.querySelector(".main-temp-description") as HTMLDivElement;
+const USER_LOGOUT_BTN = document.querySelector(".user-logout-btn") as HTMLAnchorElement;
+const MAIN_SEARCH_BAR = document.querySelector("#main-navbar") as HTMLInputElement
+let FIVE_HOUR_PARENT = document.querySelector(".hourly-parent") as HTMLDivElement;
 
 
+// GETTING CURRENT DATE
+function getCurrentDate() {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+// CONVERTING KELVIN TO CELCIUS
 function kelvinToCelsius(kelvin: number) {
     if (kelvin < 0) {
         throw new Error("Temperature in Kelvin cannot be negative.");
@@ -24,63 +42,106 @@ function kelvinToCelsius(kelvin: number) {
     const celsius = kelvin - 273.15;
     return Math.round(celsius);
 }
+// FORMATTING DATE ACCORDING TO REQUIREMENT
 function formatDate(dateString: string) {
     const date = new Date(dateString);
-    // Get day name
+    // GET DAY NAME
     const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const dayName = dayNames[date.getDay()];
-    // Get day of the month
+    // GET DAY OF THE MONTH
     const day = date.getDate();
     // Get month name
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const monthName = monthNames[date.getMonth()];
     return `${dayName}, ${day} ${monthName}`;
 }
-function convertTimestampTo12HourTime(timestamp) {
+// 12 HOUR TIME 
+function convertTimestampTo12HourTime(timestamp: number) {
     // Convert seconds to milliseconds and create a Date object
     const date = new Date(timestamp * 1000);
-
     // Extract hours and minutes
     let hours = date.getHours();
     const minutes = date.getMinutes().toString().padStart(2, '0');
-
     // Determine AM or PM
     const period = hours >= 12 ? "PM" : "AM";
-
     // Convert to 12-hour format
     hours = hours % 12 || 12; // Convert "0" hours (midnight) to "12"
-
     return `${hours}:${minutes} ${period}`;
 }
-
+// CONVERTING M TO KM
 const convertToKmh = (speedInMps: number): number => {
     return Math.round(speedInMps * 3.6);
 };
 
-
-
 window.onload = () => {
     // GETTING USER COORDINATES //
-    const location = UserLocation.getCurrentLocation();
-    ///// FIRST BLOCK  START /////
-    // USER CITY
-    location.then((coords) => {
-        const { latitude, longitude } = coords;
-        const city = USER_LOCATION.getCityFromCoords(latitude, longitude);
-        city.then((city) => {
-            USER_CITY.innerText = city || 'Unknown City';
-        });
+    const locationPromise = UserLocation.getCurrentLocation();
+    locationPromise.then(location => {
+        console.log(location);
+        debugger
+        getWeatherAndRender(location);
+        
     });
+}
+
+// COORDINATES AND RENDERING
+const getWeatherAndRender = async (location: { latitude: number; longitude: number }) => {
+    ///// FIRST BLOCK START /////
+    try {
+        // Get coordinates
+        const coords = await location;
+        const { latitude, longitude } = coords;
+
+        // USER CITY
+        // Get and display city name
+        const city = await USER_LOCATION.getCityFromCoords(latitude, longitude);
+        console.log(city);
+        debugger
+        USER_CITY.innerText = city || 'Unknown City';
+
+        // Get and display forecast data
+        const forecastResponse = await WEATHER_SERVICE.GetFiveDayForecast(latitude, longitude);
+        const forecastData = (forecastResponse as any).list;
+
+        // Update 5-day forecast
+        FIVE_DAY_FORECAST_TEMP[0].innerText = `${kelvinToCelsius(forecastData[8].main.temp)}°C`;
+        FIVE_DAY_FORECAST_DAY_DATE[0].innerText = `${formatDate(forecastData[8].dt_txt)}`;
+        FIVE_DAY_FORECAST_TEMP[1].innerText = `${kelvinToCelsius(forecastData[16].main.temp)}°C`;
+        FIVE_DAY_FORECAST_DAY_DATE[1].innerText = `${formatDate(forecastData[16].dt_txt)}`;
+        FIVE_DAY_FORECAST_TEMP[2].innerText = `${kelvinToCelsius(forecastData[24].main.temp)}°C`;
+        FIVE_DAY_FORECAST_DAY_DATE[2].innerText = `${formatDate(forecastData[24].dt_txt)}`;
+        FIVE_DAY_FORECAST_TEMP[3].innerText = `${kelvinToCelsius(forecastData[32].main.temp)}°C`;
+        FIVE_DAY_FORECAST_DAY_DATE[3].innerText = `${formatDate(forecastData[32].dt_txt)}`;
+        FIVE_DAY_FORECAST_TEMP[4].innerText = `${kelvinToCelsius(forecastData[38].main.temp)}°C`;
+        FIVE_DAY_FORECAST_DAY_DATE[4].innerText = `${formatDate(forecastData[38].dt_txt)}`;
+
+        // Update hourly forecast
+        FIVE_HOUR_PARENT.innerHTML = "";
+        forecastData.forEach((e: { dt_txt: string; main: { temp: number }; wind: { speed: number } }) => {
+            if (e.dt_txt.slice(0, 10) === getCurrentDate()) {
+                const hourly: string = `<div class="bg-sky-300 rounded-lg p-2 text-center theme-transition hourly-item flex flex-col justify-around">
+                                    <div class="font-bold mb-1">${e.dt_txt.slice(11, 16)}</div>
+                                    <div class="text-lg">${kelvinToCelsius(e.main.temp)}°C</div>
+                                    <div class="text-sm mt-4">${convertToKmh(e.wind.speed)} km/h</div>
+                                    </div>`;
+                FIVE_HOUR_PARENT.innerHTML += hourly;
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching city and forecast data:', error);
+    }
+
     // USER TIME
     const userTime = () => {
         const date = new Date();
         const hours = date.getHours();
         const minutes = date.getMinutes();
         const time = `${hours}:${minutes}`;
-        return time
+        return time;
     }
     const time = userTime();
     USER_TIME.innerText = time;
+
     // USER DAY AND DATE
     const userDateAndDate = () => {
         const date = new Date();
@@ -95,71 +156,188 @@ window.onload = () => {
         const dayName = dayNames[getDay];
         const monthName = monthNames[getMonth];
         const day = `${dayName}, ${getDate} ${monthName}`;
-        return day
+        return day;
     }
     const dayAndDate = userDateAndDate();
     USER_DAY_AND_DATE.innerText = dayAndDate;
-    ///// FIRST BLOCK  END /////
+    ///// FIRST BLOCK END /////
 
-    // 5 DAY FORECAST START //
-    location.then((coords) => {
-        const { latitude, longitude } = coords;
-        const forecast = WEATHER_SERVICE.GetFiveDayForecast(latitude, longitude);
-        forecast.then((data) => {
-            const forecastData = data.list;
-            FIVE_DAY_FORECAST_TEMP[0].innerText = `${kelvinToCelsius(forecastData[8].main.temp)}°C`;
-            FIVE_DAY_FORECAST_DAY_DATE[0].innerText = `${formatDate(forecastData[8].dt_txt)}`;
-            FIVE_DAY_FORECAST_TEMP[1].innerText = `${kelvinToCelsius(forecastData[16].main.temp)}°C`;
-            FIVE_DAY_FORECAST_DAY_DATE[1].innerText = `${formatDate(forecastData[16].dt_txt)}`;
-            FIVE_DAY_FORECAST_TEMP[2].innerText = `${kelvinToCelsius(forecastData[24].main.temp)}°C`;
-            FIVE_DAY_FORECAST_DAY_DATE[2].innerText = `${formatDate(forecastData[24].dt_txt)}`;
-            FIVE_DAY_FORECAST_TEMP[3].innerText = `${kelvinToCelsius(forecastData[32].main.temp)}°C`;
-            FIVE_DAY_FORECAST_DAY_DATE[3].innerText = `${formatDate(forecastData[32].dt_txt)}`;
-            FIVE_DAY_FORECAST_TEMP[4].innerText = `${kelvinToCelsius(forecastData[38].main.temp)}°C`;
-            FIVE_DAY_FORECAST_DAY_DATE[4].innerText = `${formatDate(forecastData[38].dt_txt)}`;
-        })
-    })
-    // 5 DAY FORECAST END //
+    // 5 DAY AND HOUR FORECAST END //
     // CURRENT WEATHER START //
-    location.then((coords) => {
+    try {
+        const coords = await location;
         const { latitude, longitude } = coords;
-        const weather = WEATHER_SERVICE.GetWeather(latitude, longitude);
-        weather.then((data) => {
-            const currentWeather = data as CurrentWeatherData | undefined;
-            if (currentWeather) {
-                console.log(currentWeather);
-                MAIN_TEMP.innerText = `${kelvinToCelsius(currentWeather.main.temp)}`;
-                MAIN_TEMP_FEELS_LIKE.innerText = `${kelvinToCelsius(currentWeather.main.feels_like)}°C`;
-                MAIN_TEMP_SUNRISE.innerText = `${convertTimestampTo12HourTime(currentWeather.sys.sunrise)}`;
-                MAIN_TEMP_SUNSET.innerText = `${convertTimestampTo12HourTime(currentWeather.sys.sunset)}`;
-                MAIN_TEMP_HUMIDITY.innerText = `${currentWeather.main.humidity}%`;
-                MAIN_TEMP_WIND_SPEED.innerText = `${convertToKmh(currentWeather.wind.speed)} km/h`;
-                MAIN_TEMP_PRESSURE.innerHTML = `${currentWeather.main.pressure} hPa`;
-                MAIN_TEMP_VISIBILITY.innerHTML = `${currentWeather.visibility} m`;
-            } else {
-                console.error('Current weather data is undefined.');
-            }
+        const weatherResponse = await WEATHER_SERVICE.GetWeather(latitude, longitude);
+        const currentWeather = weatherResponse as CurrentWeatherData | undefined;
+
+        if (currentWeather) {
+            MAIN_TEMP.innerText = `${kelvinToCelsius(currentWeather.main.temp)}`;
+            MAIN_TEMP_FEELS_LIKE.innerText = `${kelvinToCelsius(currentWeather.main.feels_like)}°C`;
+            MAIN_TEMP_SUNRISE.innerText = `${convertTimestampTo12HourTime(currentWeather.sys.sunrise)}`;
+            MAIN_TEMP_SUNSET.innerText = `${convertTimestampTo12HourTime(currentWeather.sys.sunset)}`;
+            MAIN_TEMP_HUMIDITY.innerText = `${currentWeather.main.humidity}%`;
+            MAIN_TEMP_WIND_SPEED.innerText = `${convertToKmh(currentWeather.wind.speed)} km/h`;
+            MAIN_TEMP_PRESSURE.innerHTML = `${currentWeather.main.pressure} hPa`;
+            MAIN_TEMP_VISIBILITY.innerHTML = `${currentWeather.visibility} m`;
+            MAIN_TEMP_DESCRIPTION.innerHTML = `${currentWeather.weather[0].description}`;
+        } else {
+            console.error('Current weather data is undefined.');
         }
-        )
-    })
-
-
+    } catch (error) {
+        console.error('Error fetching current weather data:', error);
+    }
     // CURRENT WEATHER END //
-
 }
-// USER PROFILE MODAL TOGGLE
-const userProfile: HTMLElement | null = document.getElementById('user-profile');
-const profileModal: HTMLElement | null = document.getElementById('profile-modal');
 
-userProfile?.addEventListener('click', () => {
-    if (profileModal) {
-        profileModal.classList.toggle('hidden');
-    }
-});
 
-// CLOSE MODAL IF CLICKED OUTSIDE
-document.addEventListener('click', (event: MouseEvent) => {
-    if (profileModal && !profileModal.contains(event.target as Node) && event.target !== userProfile) {
-        profileModal.classList.add('hidden');
+
+// GETTING NAME
+const handleSearch = (event: Event) => {
+    event.preventDefault()
+    const event_target = event.target as HTMLFormElement
+    const input_field = event_target[0] as HTMLInputElement
+    console.log(input_field.value);
+
+    const locationn = GET_LAT_LON.getLatLonFromLocation(input_field.value)
+    locationn.then((coords) => {
+        if (coords) {
+            const { latitude, longitude } = coords;
+            console.log(latitude);
+            console.log(longitude);
+            getWeatherAndRender(coords);
+        }
+    })
+}
+
+// GETTING LOCATION FROM NAME
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// NAVBAR //
+class NavbarHandler {
+    private profileDropdown: DropdownElements;
+    constructor() {
+        // Initialize dropdown elements
+        this.profileDropdown = {
+            button: document.getElementById('user-profile'),
+            dropdown: document.getElementById('profile-modal'),
+            isOpen: false
+        };
+        this.initEventListeners();
+        this.initFavoritesPositioning();
     }
+    private initEventListeners(): void {
+        // Attach profile dropdown toggle event
+        if (this.profileDropdown.button && this.profileDropdown.dropdown) {
+            this.profileDropdown.button.addEventListener('click', (e: Event) => {
+                e.stopPropagation();
+                this.toggleProfileDropdown();
+            });
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e: Event) => {
+                const target = e.target as HTMLElement;
+                if (this.profileDropdown.isOpen &&
+                    this.profileDropdown.dropdown &&
+                    !this.profileDropdown.dropdown.contains(target) &&
+                    target !== this.profileDropdown.button) {
+                    this.closeProfileDropdown();
+                }
+            });
+        } else {
+            console.error('Profile dropdown elements not found in the DOM');
+        }
+        // Close dropdowns when pressing Escape key
+        document.addEventListener('keydown', (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && this.profileDropdown.isOpen) {
+                this.closeProfileDropdown();
+            }
+        });
+    }
+    private initFavoritesPositioning(): void {
+        // Get the favorites submenu
+        const favoritesMenu = document.getElementById('favorites-submenu');
+        if (!favoritesMenu) return;
+        // Position the submenu on the left side
+        favoritesMenu.classList.add('right-full');
+        favoritesMenu.classList.remove('left-full');
+    }
+    private toggleProfileDropdown(): void {
+        if (!this.profileDropdown.dropdown) return;
+        if (this.profileDropdown.isOpen) {
+            this.closeProfileDropdown();
+        } else {
+            this.openProfileDropdown();
+        }
+    }
+    private openProfileDropdown(): void {
+        if (!this.profileDropdown.dropdown) return;
+        this.profileDropdown.dropdown.classList.remove('hidden');
+        this.profileDropdown.isOpen = true;
+        // Add aria attributes for accessibility
+        if (this.profileDropdown.button) {
+            this.profileDropdown.button.setAttribute('aria-expanded', 'true');
+        }
+    }
+    private closeProfileDropdown(): void {
+        if (!this.profileDropdown.dropdown) return;
+        this.profileDropdown.dropdown.classList.add('hidden');
+        this.profileDropdown.isOpen = false;
+        // Update aria attributes
+        if (this.profileDropdown.button) {
+            this.profileDropdown.button.setAttribute('aria-expanded', 'false');
+        }
+    }
+}
+
+// LOGOUT FUNCTIONALITY 
+USER_LOGOUT_BTN.addEventListener("click", () => {
+    sessionStorage.clear()
+    window.location.href = "login.html";
+})
+
+// COUNT DOWN FOR NO USER
+function countdown(seconds: number): void {
+    const intervalId = setInterval(() => {
+        const countdownElement = document.querySelector(".countdown");
+        if (countdownElement) {
+            countdownElement.innerHTML = ""
+            countdownElement.innerHTML = seconds.toString();
+        }
+        seconds--;
+        if (seconds === -1) {
+            clearInterval(intervalId); // Stop the countdown
+        }
+    }, 1000); // Execute every second
+}
+// MODAL FOR NO USER
+function showAlert(className: string) {
+    const dom = document.querySelector(`.${className}`) as HTMLDivElement;
+    countdown(3)
+    dom?.classList.add("block")
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+        dom?.classList.remove(className, 'block');
+        window.location.href = "login.html";
+    }, 5000);
+}
+
+
+
+// Initialize navbar handler when DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    new NavbarHandler();
 });

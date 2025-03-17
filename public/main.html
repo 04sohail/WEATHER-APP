@@ -8,10 +8,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="icon" href="../assets/img/logo.png" type="image/x-icon">
   <link rel="stylesheet" href="./css/index.css">
+  <!-- ADDING FONT AWESOME FOR BETTER ICONS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body class="min-h-screen bg-sky-200">
-  <!-- LOADING SCREEN  -->
+<body class="min-h-screen bg-sky-200 flex flex-col">
+  <!-- LOADING SCREEN -->
   <div class="fullScreen">
     <div class="middle">
       <div class="bar bar1"></div>
@@ -24,181 +26,208 @@
       <div class="bar bar8"></div>
     </div>
   </div>
+  <!-- USER NOT FOUND MODAL  -->
 
-  <!-- Navbar -->
-  <header class="bg-white shadow-lg py-3 flex items-center justify-between">
-    <!-- Logo and Search Bar -->
-    <div class="flex items-center space-x-4">
-      <!-- Logo -->
-      <img src="../assets/img/logo.png" class="h-[50px]" alt="Logo">
-      <!-- Search Bar -->
-      <div>
-        <input type="text" placeholder="Search for your preferred city..."
-          class="px-4 py-1 rounded-full text-sm bg-sky-100 text-blue-900 border-none focus:outline-none placeholder-blue-400 w-[230px]">
-      </div>
-    </div>
-
-    <!-- Favorite Icon and User Profile -->
-    <div class="flex items-center space-x-4">
-      <!-- Favorite Icon -->
-      <div class="relative group">
-        <button>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-            class="w-6 h-6 text-blue-900">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l2.005 6.174a1 1 0 00.95.69h6.462c.969 0 1.371 1.24.588 1.81l-5.227 3.794a1 1 0 00-.364 1.118l2.005 6.174c.3.921-.755 1.688-1.539 1.118l-5.227-3.794a1 1 0 00-1.176 0l-5.227 3.794c-.784.57-1.838-.197-1.539-1.118l2.005-6.174a1 1 0 00-.364-1.118L2.049 11.6c-.783-.57-.38-1.81.588-1.81h6.462a1 1 0 00.95-.69l2.005-6.174z" />
-          </svg>
-        </button>
-        <!-- Tooltip -->
-        <div
-          class="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded-md py-1 px-2">
-          Add to Favorite
-        </div>
-      </div>
-
-      <!-- User Profile -->
-      <div class="relative">
-        <img
-          src="https://imgs.search.brave.com/ARCfKeOibDd6diwZINx0xnvl2LNybUAT12BOiJS_JDM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9yYXcu/Z2l0aHVidXNlcmNv/bnRlbnQuY29tL21v/bm8tY29tcGFueS9t/b25vLWljb25zL21h/c3Rlci9zdmcvdXNl/ci5zdmc"
-          alt="User Profile" class="w-8 h-8 rounded-full cursor-pointer" id="user-profile">
-        <!-- Modal -->
-        <div id="profile-modal" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2">
-          <a href="#" class="block px-4 py-2 text-blue-900 hover:bg-sky-100">Profile</a>
-          <div class="relative group">
-            <a href="#" class="block px-4 py-2 text-blue-900 hover:bg-sky-100">Favorites</a>
-            <!-- Submenu -->
-            <div
-              class="hidden absolute left-full top-0 mt-0 w-40 bg-white rounded-lg shadow-lg py-2 group-hover:block group-focus:block z-10">
-              <a href="#" class="block px-4 py-2 text-blue-900 hover:bg-sky-100">Favorite 1</a>
-              <a href="#" class="block px-4 py-2 text-blue-900 hover:bg-sky-100">Favorite 2</a>
-              <a href="#" class="block px-4 py-2 text-blue-900 hover:bg-sky-100">Favorite 3</a>
+  <div class="fullScreen user-not-found">
+    <div class="middle">
+      <div class="min-h-screen w-screen">
+        <div id="default-modal" tabindex="-1" aria-hidden="true"
+          class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+          <div class=" left-[35%] relative p-4 w-[400px] max-w-2xl max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow-sm">
+              <!-- Modal header -->
+              <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-900">
+                  No User Found
+                </h3>
+              </div>
+              <!-- Modal body -->
+              <div class="p-4 md:p-5 space-y-4">
+                <p class="text-base leading-relaxed text-gray-500">
+                  Redirecting Back To Login Page In <span class="countdown"></span>
+                </p>
+              </div>
             </div>
           </div>
-          <a href="#" class="block px-4 py-2 text-blue-900 hover:bg-sky-100">Logout</a>
         </div>
       </div>
     </div>
+  </div>
+
+
+  <!-- REDESIGNED NAVBAR -->
+  <header class="bg-gradient-to-r from-blue-600 to-blue-400 shadow-lg py-4">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between">
+        <!-- LOGO AND BRAND -->
+        <div class="flex items-center space-x-2">
+          <img src="../assets/img/logo.png" class="h-12 object-contain" alt="Logo">
+        </div>
+
+        <!-- SEARCH BAR -->
+        <div class="relative max-w-md w-full mx-4">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-search text-blue-800"></i>
+          </div>
+          <form onsubmit="handleSearch(event)">
+            <input type="text" placeholder="Search for your preferred city..." id="main-navbar"
+              class="pl-10 pr-4 py-2 rounded-full w-full text-sm bg-white/90 text-blue-900 border-none focus:outline-none focus:ring-2 focus:ring-white focus:bg-white shadow-inner">
+          </form>
+        </div>
+
+        <!-- NAVIGATION ICONS -->
+        <div class="flex items-center space-x-6">
+          <!-- FAVORITE ICON -->
+          <div class="relative group">
+            <button class="text-white hover:text-blue-100 transition-colors">
+              <i class="fas fa-star text-xl"></i>
+            </button>
+            <div
+              class="hidden group-hover:block absolute -top-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded-md py-1 px-2 whitespace-nowrap">
+              Favorites
+            </div>
+          </div>
+          <!-- USER PROFILE -->
+          <div class="">
+            <button class="flex items-center space-x-1 text-white hover:text-blue-100 transition-colors"
+              id="user-profile">
+              <img
+                src="https://imgs.search.brave.com/ARCfKeOibDd6diwZINx0xnvl2LNybUAT12BOiJS_JDM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9yYXcu/Z2l0aHVidXNlcmNv/bnRlbnQuY29tL21v/bm8tY29tcGFueS9t/b25vLWljb25zL21h/c3Rlci9zdmcvdXNl/ci5zdmc"
+                alt="User Profile" class="w-8 h-8 rounded-full bg-white p-1">
+              <span class="hidden md:inline">Account</span>
+              <i class="fas fa-chevron-down text-xs"></i>
+            </button>
+            <!-- USER DROPDOWN MENU -->
+            <div id="profile-modal" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-10">
+              <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50">
+                <i class="fas fa-user-circle mr-2 text-blue-500"></i>
+                <span>Profile</span>
+              </a>
+              <div class="relative group">
+                <a href="#" class="flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-blue-50">
+                  <div class="flex items-center">
+                    <i class="fas fa-star mr-2 text-blue-500"></i>
+                    <span>Favorites</span>
+                  </div>
+                  <i class="fas fa-chevron-right text-xs"></i>
+                </a>
+                <!-- SUBMENU -->
+                <div
+                  class="hidden absolute right-full top-0 mt-0 w-48 bg-white rounded-lg shadow-lg py-1 group-hover:block">
+                  <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50">
+                    <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
+                    <span>New York</span>
+                  </a>
+                  <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50">
+                    <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
+                    <span>London</span>
+                  </a>
+                  <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50">
+                    <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
+                    <span>Tokyo</span>
+                  </a>
+                </div>
+              </div>
+              <div class="border-t border-gray-100 my-1"></div>
+              <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50 user-logout-btn">
+                <i class="fas fa-sign-out-alt mr-2 text-blue-500"></i>
+                <span>Logout</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-7xl mx-auto">
-    <!-- Left Card: Time and Location -->
-    <div class="bg-sky-100 text-blue-900 rounded-lg p-4 card-shadow theme-transition" id="time-location-card">
-      <h2 class="text-xl font-bold mb-2" id="user-city"></h2>
-      <div class="text-6xl font-bold mb-1" id="user-time">14:25</div>
-      <div class="text-sm text-blue-600 theme-transition" id="day-and-date">Tuesday, 11 Mar</div>
-    </div>
-    <!-- Right Card: Current Weather -->
-    <div class="bg-sky-100 text-blue-900 rounded-lg p-4 flex card-shadow theme-transition" id="current-weather-card">
-      <div class="flex-1">
-        <div class="flex items-baseline">
-          <span class="text-6xl font-bold main-temp">18</span>
-          <span class="text-3xl">°C</span>
-        </div>
-        <div class="text-sm text-blue-600 mb-4 theme-transition" id="feels-like-text">Feels like: <span
-            class="main-temp-feels-like"></span></div>
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <div>
-            <div class="font-bold">Sunrise</div>
-            <div class="main-temp-sunrise"></div>
+  <!-- MAIN CONTENT - CENTERED BOTH VERTICALLY AND HORIZONTALLY -->
+  <main class="flex-grow flex items-center justify-center">
+    <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-7xl w-full">
+      <!-- LEFT CARD: TIME AND LOCATION -->
+      <div class="bg-sky-100 text-blue-900 rounded-lg p-4 card-shadow theme-transition" id="time-location-card">
+        <h2 class="text-xl font-bold mb-2" id="user-city"></h2>
+        <div class="text-6xl font-bold mb-1" id="user-time">14:25</div>
+        <div class="text-sm text-blue-600 theme-transition" id="day-and-date">Tuesday, 11 Mar</div>
+      </div>
+      <!-- RIGHT CARD: CURRENT WEATHER -->
+      <div class="bg-sky-100 text-blue-900 rounded-lg p-4 flex card-shadow theme-transition" id="current-weather-card">
+        <div class="flex-1">
+          <div class="flex items-baseline">
+            <span class="text-6xl font-bold main-temp">18</span>
+            <span class="text-3xl">°C</span>
           </div>
-          <div>
-            <div class="font-bold">Sunset</div>
-            <div class="main-temp-sunset"></div>
+          <div class="text-sm text-blue-600 mb-4 theme-transition" id="feels-like-text">Feels like: <span
+              class="main-temp-feels-like"></span></div>
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <div class="font-bold">Sunrise</div>
+              <div class="main-temp-sunrise"></div>
+            </div>
+            <div>
+              <div class="font-bold">Sunset</div>
+              <div class="main-temp-sunset"></div>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col justify-between text-right">
+          <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mb-4">
+            <div class="text-right">
+              <div class="main-temp-humidity"></div>
+              <div class="text-blue-600 theme-transition secondary-text">Humidity</div>
+            </div>
+            <div class="text-right">
+              <div class="main-temp-wind-speed"></div>
+              <div class="text-blue-600 theme-transition secondary-text">Wind Speed</div>
+            </div>
+            <div class="text-right">
+              <div class="main-temp-pressure"></div>
+              <div class="text-blue-600 theme-transition secondary-text">Pressure</div>
+            </div>
+            <div class="text-right">
+              <div class="main-temp-visibility"></div>
+              <div class="text-blue-600 theme-transition secondary-text">Visibility</div>
+            </div>
+          </div>
+          <div class="text-xl font-bold main-temp-description"></div>
+        </div>
+      </div>
+      <!-- 5 DAYS FORECAST -->
+      <div class="bg-sky-100 text-blue-900 rounded-lg p-4 card-shadow theme-transition" id="forecast-card">
+        <h3 class="text-lg font-bold mb-2">5 Days Forecast:</h3>
+        <div class="space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="five-day-forecast-temp"></span>
+            <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="five-day-forecast-temp"></span>
+            <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="five-day-forecast-temp"></span>
+            <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="five-day-forecast-temp"></span>
+            <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="five-day-forecast-temp"></span>
+            <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
           </div>
         </div>
       </div>
-      <div class="flex flex-col justify-between text-right">
-        <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mb-4">
-          <div class="text-right">
-            <div class="main-temp-humidity"></div>
-            <div class="text-blue-600 theme-transition secondary-text">Humidity</div>
-          </div>
-          <div class="text-right">
-            <div class="main-temp-wind-speed"></div>
-            <div class="text-blue-600 theme-transition secondary-text">Wind Speed</div>
-          </div>
-          <div class="text-right">
-            <div class="main-temp-pressure"></div>
-            <div class="text-blue-600 theme-transition secondary-text">Pressure</div>
-          </div>
-          <div class="text-right">
-            <div class="main-temp-visibility"></div>
-            <div class="text-blue-600 theme-transition secondary-text">Visibility</div>
-          </div>
-        </div>
-        <div class="text-xl font-bold">Partly Cloudy</div>
-      </div>
-    </div>
-    <!-- 5 Days Forecast -->
-    <div class="bg-sky-100 text-blue-900 rounded-lg p-4 card-shadow theme-transition" id="forecast-card">
-      <h3 class="text-lg font-bold mb-2">5 Days Forecast:</h3>
-      <div class="space-y-2">
-        <div class="flex justify-between items-center">
-          <span class="five-day-forecast-temp"></span>
-          <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
-        </div>
-        <div class="flex justify-between items-center">
-          <span class="five-day-forecast-temp"></span>
-          <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
-        </div>
-        <div class="flex justify-between items-center">
-          <span class="five-day-forecast-temp"></span>
-          <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
-        </div>
-        <div class="flex justify-between items-center">
-          <span class="five-day-forecast-temp"></span>
-          <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
-        </div>
-        <div class="flex justify-between items-center">
-          <span class="five-day-forecast-temp"></span>
-          <span class="text-blue-600 theme-transition secondary-text five-day-forecast-day-date"></span>
-        </div>
-      </div>
-    </div>
 
-    <!-- Hourly Forecast -->
-    <div class="bg-sky-100 text-blue-900 rounded-lg p-4 card-shadow theme-transition" id="hourly-card">
-      <h3 class="text-lg font-bold mb-2">Hourly Forecast:</h3>
-      <div class="grid grid-cols-5 gap-2">
-
-        <!-- 15:00 -->
-        <div class="bg-sky-300 rounded-lg p-2 text-center theme-transition hourly-item">
-          <div class="font-bold mb-1">15:00</div>
-          <div class="text-lg">18°C</div>
-          <div class="text-sm mt-4">6km/h</div>
-        </div>
-
-        <!-- 18:00 -->
-        <div class="bg-sky-300 rounded-lg p-2 text-center theme-transition hourly-item">
-          <div class="font-bold mb-1">18:00</div>
-          <div class="text-lg">17°C</div>
-          <div class="text-sm mt-4">4km/h</div>
-        </div>
-
-        <!-- 21:00 -->
-        <div class="bg-sky-400 rounded-lg p-2 text-center theme-transition hourly-item">
-          <div class="font-bold mb-1">21:00</div>
-          <div class="text-lg">15°C</div>
-          <div class="text-sm mt-4">3km/h</div>
-        </div>
-
-        <!-- 00:00 -->
-        <div class="bg-blue-500 rounded-lg p-2 text-center theme-transition hourly-item">
-          <div class="font-bold mb-1">00:00</div>
-          <div class="text-lg">13°C</div>
-          <div class="text-sm mt-4">2km/h</div>
-        </div>
-
-        <!-- 03:00 -->
-        <div class="bg-blue-500 text-white rounded-lg p-2 text-center theme-transition hourly-night">
-          <div class="font-bold mb-1">03:00</div>
-          <div class="text-lg">11°C</div>
-          <div class="text-sm mt-4">2km/h</div>
+      <!-- HOURLY FORECAST -->
+      <div class="bg-sky-100 text-blue-900 rounded-lg p-4 card-shadow theme-transition" id="hourly-card">
+        <h3 class="text-lg font-bold mb-2">Hourly Forecast:</h3>
+        <div class="grid grid-cols-5 gap-2 h-[145px] hourly-parent">
+          <!-- DYNAMIC DATA -->
         </div>
       </div>
     </div>
   </main>
+
   <script src="../dist/src/ts/apiservice.js"></script>
   <script src="../dist/src/ts/helping.js"></script>
   <script src="../dist/src/ts/main.js"></script>

@@ -1,4 +1,3 @@
-
 interface ValidationResult {
     isValid: boolean;
     errorMessage: string;
@@ -11,7 +10,6 @@ type User = {
     email: string;
     password: string;
 };
-
 
 interface CurrentWeatherData {
     coord: {
@@ -74,7 +72,7 @@ interface WeatherForecast {
 interface WeatherData {
     dt: number;
     main: MainWeatherData;
-    weather: WeatherDescription[];
+    weather: WeatherDescription;
     clouds: Clouds;
     wind: Wind;
     visibility: number;
@@ -130,4 +128,29 @@ interface CityInfo {
 interface Coordinates {
     lat: number;
     lon: number;
+}
+
+interface DropdownElements {
+    button: HTMLElement | null;
+    dropdown: HTMLElement | null;
+    isOpen: boolean;
+}
+
+interface GeoLocation {
+    name: string;
+    lat: number;
+    lon: number;
+    country: string;
+    state?: string;
+}
+
+interface DropdownElements {
+    button: HTMLElement | null;
+    dropdown: HTMLElement | null;
+    isOpen: boolean;
+}
+
+interface Location {
+    latitude: number;
+    longitude: number
 }

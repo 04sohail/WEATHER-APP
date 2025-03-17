@@ -10,7 +10,7 @@ class FormValidator {
         return FormValidator.instance;
     }
 
-    // Email validation
+    // EMAIL VALIDATION
     public validateEmail(email: string): ValidationResult {
         if (!email || email.trim() === '') {
             return { isValid: false, errorMessage: 'Email is required' };
@@ -24,7 +24,7 @@ class FormValidator {
         return { isValid: true, errorMessage: '' };
     }
 
-    // Password validation for login
+    // PASSWORD VALIDATION FOR LOGIN
     public validateLoginPassword(password: string): ValidationResult {
         if (!password || password.trim() === '') {
             return { isValid: false, errorMessage: 'Password is required' };
@@ -33,7 +33,7 @@ class FormValidator {
         return { isValid: true, errorMessage: '' };
     }
 
-    // Password validation for signup with stronger requirements
+    // PASSWORD VALIDATION FOR SIGNUP WITH STRONGER REQUIREMENTS
     public validateSignupPassword(password: string): ValidationResult {
         if (!password || password.trim() === '') {
             return { isValid: false, errorMessage: 'Password is required' };
@@ -54,7 +54,7 @@ class FormValidator {
         return { isValid: true, errorMessage: '' };
     }
 
-    // Password confirmation validation
+    // PASSWORD CONFIRMATION VALIDATION
     public validateConfirmPassword(password: string, confirmPassword: string): ValidationResult {
         if (!confirmPassword || confirmPassword.trim() === '') {
             return { isValid: false, errorMessage: 'Please confirm your password' };
@@ -67,7 +67,7 @@ class FormValidator {
         return { isValid: true, errorMessage: '' };
     }
 
-    // Name validation
+    // NAME VALIDATION
     public validateName(name: string, fieldName: string): ValidationResult {
         if (!name || name.trim() === '') {
             return { isValid: false, errorMessage: `${fieldName} is required` };
@@ -80,7 +80,7 @@ class FormValidator {
         return { isValid: true, errorMessage: '' };
     }
 
-    // Terms checkbox validation
+    // TERMS CHECKBOX VALIDATION
     public validateTermsAgreement(checked: boolean): ValidationResult {
         if (!checked) {
             return { isValid: false, errorMessage: 'You must agree to the Terms of Service and Privacy Policy' };
@@ -90,7 +90,7 @@ class FormValidator {
     }
 }
 
-// Form handling classes
+// FORM HANDLING CLASSES
 class FormHandler {
     protected validator: FormValidator;
     constructor() {
@@ -103,7 +103,7 @@ class FormHandler {
             errorElement.textContent = message;
             errorElement.classList.remove('hidden');
 
-            // Add red border to the input
+            // ADD RED BORDER TO THE INPUT
             const inputId = elementId.replace('-error', '');
             const inputElement = document.getElementById(inputId) as HTMLInputElement;
             if (inputElement) {
@@ -119,7 +119,7 @@ class FormHandler {
             errorElement.textContent = '';
             errorElement.classList.add('hidden');
 
-            // Reset input border
+            // RESET INPUT BORDER
             const inputId = elementId.replace('-error', '');
             const inputElement = document.getElementById(inputId) as HTMLInputElement;
             if (inputElement) {
@@ -180,53 +180,47 @@ class LoginFormHandler extends FormHandler {
             this.hideError('login-email-error');
         }
     }
-
     private validatePassword(): void {
         const password = this.passwordInput.value;
         const result = this.validator.validateLoginPassword(password);
-
         if (!result.isValid) {
             this.showError('login-password-error', result.errorMessage);
         } else {
             this.hideError('login-password-error');
         }
     }
-
     private async handleSubmit(event: Event): Promise<void> {
         event.preventDefault();
-        // Perform validation
+        // PERFORM VALIDATION
         const email = this.emailInput.value;
         const password = this.passwordInput.value;
-
         const emailValidation = this.validator.validateEmail(email);
         const passwordValidation = this.validator.validateLoginPassword(password);
-
-        // Display validation errors if any
+        console.log(email);
+        console.log(password);
+        // DISPLAY VALIDATION ERRORS IF ANY
         if (!emailValidation.isValid) {
             this.showError('login-email-error', emailValidation.errorMessage);
         } else {
             this.hideError('login-email-error');
         }
-
         if (!passwordValidation.isValid) {
             this.showError('login-password-error', passwordValidation.errorMessage);
         } else {
             this.hideError('login-password-error');
         }
-
-        // If all validations pass, proceed with login
+        // IF ALL VALIDATIONS PASS, PROCEED WITH LOGIN
         if (emailValidation.isValid && passwordValidation.isValid) {
             const API_RESPONSE = await this.APIInstance.GetSingleUser(`email=${encodeURIComponent(this.emailInput.value)}&password=${encodeURIComponent(this.passwordInput.value)}`) as Response[];
             console.log(API_RESPONSE);
-            if (!API_RESPONSE) {
-                alert("SORRY NO USER FOUND")
+            if (API_RESPONSE.length === 0) {
+                showToast("toast-error-login")
             }
             else {
                 const userData = API_RESPONSE[0];
                 console.log(userData);
                 window.location.href = "main.html";
                 sessionStorage.setItem("user", JSON.stringify(userData));
-                debugger;
             }
         }
     }
@@ -278,7 +272,7 @@ class SignupFormHandler extends FormHandler {
             this.passwordInput.addEventListener('blur', this.validatePassword.bind(this));
             this.passwordInput.addEventListener('input', () => {
                 this.validatePassword();
-                // Re-validate confirm password when password changes
+                // RE-VALIDATE CONFIRM PASSWORD WHEN PASSWORD CHANGES
                 if (this.confirmPasswordInput.value) {
                     this.validateConfirmPassword();
                 }
@@ -362,10 +356,10 @@ class SignupFormHandler extends FormHandler {
         }
     }
 
-    private handleSubmit(event: Event): void {
+    private async handleSubmit(event: Event): Promise<void> {
         event.preventDefault();
 
-        // Perform validation
+        // PERFORM VALIDATION
         const firstName = this.firstNameInput.value;
         const lastName = this.lastNameInput.value;
         const email = this.emailInput.value;
@@ -380,7 +374,7 @@ class SignupFormHandler extends FormHandler {
         const confirmPasswordValidation = this.validator.validateConfirmPassword(password, confirmPassword);
         const termsValidation = this.validator.validateTermsAgreement(termsChecked);
 
-        // Display validation errors if any
+        // DISPLAY VALIDATION ERRORS IF ANY
         if (!firstNameValidation.isValid) {
             this.showError('first-name-error', firstNameValidation.errorMessage);
         }
@@ -404,28 +398,36 @@ class SignupFormHandler extends FormHandler {
         if (!termsValidation.isValid) {
             this.showError('terms-error', termsValidation.errorMessage);
         }
-
-        if (
-            firstNameValidation.isValid &&
-            lastNameValidation.isValid &&
-            emailValidation.isValid &&
-            passwordValidation.isValid &&
-            confirmPasswordValidation.isValid &&
-            termsValidation.isValid
-        ) {
-            const user: User = {
-                id: Date.now().toString(),
-                first_name: firstName,
-                last_name: lastName,
-                email: email,
-                password: password,
-            };
-            this.APIInstance.PostUser(user, "users");
+        if (email.length) {
+            const findemail: Object[] | undefined = await this.APIInstance.GetSingleUser(`email=${email.trim()}`)
+            console.log(findemail?.length);
+            console.log(findemail);
+            if (findemail?.length === 0) {
+                if (
+                    firstNameValidation.isValid &&
+                    lastNameValidation.isValid &&
+                    emailValidation.isValid &&
+                    passwordValidation.isValid &&
+                    confirmPasswordValidation.isValid &&
+                    termsValidation.isValid
+                ) {
+                    const user: User = {
+                        id: Date.now().toString(),
+                        first_name: firstName,
+                        last_name: lastName,
+                        email: email,
+                        password: password,
+                    };
+                    this.APIInstance.PostUser(user, "users");
+                }
+            } else {
+                showToast("toast-error-register")
+                debugger;
+            }
         }
     }
 }
-
-// Tab switching functionality
+// TAB SWITCHING FUNCTIONALITY
 class TabSwitcher {
     private loginTab: HTMLElement;
     private signupTab: HTMLElement;
@@ -465,9 +467,19 @@ class TabSwitcher {
     }
 }
 
-// Initialize the application
+// INITIALIZE THE APPLICATION
 document.addEventListener('DOMContentLoaded', () => {
     new TabSwitcher();
     new LoginFormHandler();
     new SignupFormHandler();
 });
+
+function showToast(id: string) {
+    debugger
+    const dom = document.getElementById(id) as HTMLDivElement;
+    dom?.classList.remove("hidden")
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+        dom?.classList.add(id, 'hidden');
+    }, 3000);
+}

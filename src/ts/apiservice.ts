@@ -21,7 +21,6 @@ class UserApiService {
     // POSTING USER TO API 
     async PostUser(user: User, endPoint: string | null): Promise<void> {
         try {
-            console.log("INSIDE POST USER");
             this.LOADING_SCREEN.style.display = "block";
             const API_RESPONSE: Response = await fetch(`${this.API_URL}/${endPoint}`, {
                 method: "POST",
@@ -65,7 +64,6 @@ class UserLocation extends UserApiService {
             const response = await fetch(url);
             const data = await response.json();
             if (data && data.length > 0) {
-                console.log(data[0].name);
                 const city = data[0].name;
                 return city;
             } else {
@@ -81,7 +79,7 @@ class UserLocation extends UserApiService {
 class Weather extends UserApiService {
 
     // CURRENT WEATHER //
-    async GetWeather(lat: number, lon: number, ): Promise<JSON | undefined> {
+    async GetWeather(lat: number, lon: number,): Promise<JSON | undefined> {
         try {
             this.LOADING_SCREEN.style.display = "block";
             const API_response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${this.WEATHER_API_KEY}`);
@@ -112,5 +110,39 @@ class Weather extends UserApiService {
             return undefined;
         }
     };
-
 }
+
+
+// FETCH LATITUDE AND LONGITUDE FROM LOCATION NAME
+class getLatAndLon extends UserApiService {
+    // FUNCTION TO FETCH LATITUDE AND LONGITUDE FROM LOCATION NAME
+    async getLatLonFromLocation(locationName: string): Promise<{ latitude: number; longitude: number } | null> {
+        const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(locationName)}&limit=1&appid=${this.WEATHER_API_KEY}`;
+        try {
+            const response = await fetch(url);
+            const data: GeoLocation[] = await response.json();
+            if (data && data.length > 0) {
+                const { lat, lon } = data[0]; // EXTRACT LATITUDE AND LONGITUDE
+                console.log(lat, lon);
+                debugger;
+                return { latitude: lat, longitude: lon };
+            } else {
+                throw new Error("Location not found!");
+            }
+        } catch (error) {
+            console.error("Error fetching geocoding data:", (error as Error).message);
+            return null;
+        }
+    }
+}
+
+// EXAMPLE USAGE
+new getLatAndLon().getLatLonFromLocation("dubai")
+    .then((coords) => {
+        if (coords) {
+            console.log(`Latitude: ${coords.latitude}, Longitude: ${coords.longitude}`);
+        } else {
+            console.log("Coordinates could not be retrieved.");
+        }
+    })
+    .catch((error) => console.error(error));

@@ -79,7 +79,22 @@
           <!-- Login Form -->
           <div id="login-form" class="p-6">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Welcome Back</h2>
-
+            <!-- toast message -->
+            <div class="hidden" id="toast-error-login">
+              <div id="toast-message"
+                class="relative flex items-center w-full  p-4 mb-4 text-white bg-[#5c90c6] rounded-lg shadow-sm z-10 "
+                role="alert">
+                <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-500 rounded-lg">
+                  <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                    viewBox="0 0 20 20">
+                    <path
+                      d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z" />
+                  </svg>
+                  <span class="sr-only">Error icon</span>
+                </div>
+                <div class="ms-3 text-sm font-normal">User Not Found</div>
+              </div>
+            </div>
             <form id="login-form-element" class="space-y-4" novalidate>
               <div>
                 <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -89,15 +104,13 @@
                   </span>
                   <input type="email" id="login-email" name="login-email"
                     class="pl-10 w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="your@email.com" required>
+                    placeholder="Email" required>
                   <div id="login-email-error" class="text-red-500 text-xs mt-1 hidden"></div>
                 </div>
               </div>
-
               <div>
                 <div class="flex justify-between items-center mb-1">
                   <label for="login-password" class="block text-sm font-medium text-gray-700">Password</label>
-
                 </div>
                 <div class="relative">
                   <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
@@ -112,7 +125,6 @@
                   <div id="login-password-error" class="text-red-500 text-xs mt-1 hidden"></div>
                 </div>
               </div>
-
               <button type="submit"
                 class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 flex items-center justify-center">
                 <i class="fas fa-sign-in-alt mr-2"></i>
@@ -120,10 +132,25 @@
               </button>
             </form>
           </div>
-
           <!-- Signup Form (Hidden by default) -->
           <div id="signup-form" class="hidden p-6">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Create Account</h2>
+            <!-- toast message -->
+            <div class="hidden" id="toast-error-register">
+              <div id="toast-message"
+                class="relative flex items-center w-full  p-4 mb-4 text-white bg-[#5c90c6] rounded-lg shadow-sm z-10 "
+                role="alert">
+                <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-500 rounded-lg">
+                  <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                    viewBox="0 0 20 20">
+                    <path
+                      d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z" />
+                  </svg>
+                  <span class="sr-only">Error icon</span>
+                </div>
+                <div class="ms-3 text-sm font-normal">User with same email already exists!</div>
+              </div>
+            </div>
 
             <form id="signup-form-element" class="space-y-4" novalidate>
               <div class="grid grid-cols-2 gap-4">
@@ -151,7 +178,7 @@
                   </span>
                   <input type="email" id="signup-email" name="signup-email"
                     class="pl-10 w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 signup"
-                    placeholder="your@email.com" required>
+                    placeholder="Email" required>
                   <div id="signup-email-error" class="text-red-500 text-xs mt-1 hidden"></div>
                 </div>
               </div>
