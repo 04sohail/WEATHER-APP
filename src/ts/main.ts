@@ -1,8 +1,18 @@
-const USER = sessionStorage.getItem("user")
+const USER = JSON.parse(sessionStorage.getItem("user") as string)
+const flag_check = JSON.parse(sessionStorage.getItem("flash_flag") as string)
+console.log(USER);
+
+
 if (!USER) {
-    showAlert("user-not-found")
+    window.location.href="login.html"
 }
+else if (flag_check === true) {
+    window.FlashMessage.success('Logged In Successfully', { type: 'success', timeout: 2000 });
+    sessionStorage.setItem("flash_flag", "false")
+}
+
 // API INSTANCES
+const USER_API_SERVICE = new UserApiService();
 const WEATHER_SERVICE = new Weather();
 const USER_LOCATION = new UserLocation();
 const GET_LAT_LON = new getLatAndLon();
@@ -42,6 +52,7 @@ function kelvinToCelsius(kelvin: number) {
     const celsius = kelvin - 273.15;
     return Math.round(celsius);
 }
+
 // FORMATTING DATE ACCORDING TO REQUIREMENT
 function formatDate(dateString: string) {
     const date = new Date(dateString);
@@ -55,6 +66,7 @@ function formatDate(dateString: string) {
     const monthName = monthNames[date.getMonth()];
     return `${dayName}, ${day} ${monthName}`;
 }
+
 // 12 HOUR TIME 
 function convertTimestampTo12HourTime(timestamp: number) {
     // Convert seconds to milliseconds and create a Date object
@@ -68,6 +80,7 @@ function convertTimestampTo12HourTime(timestamp: number) {
     hours = hours % 12 || 12; // Convert "0" hours (midnight) to "12"
     return `${hours}:${minutes} ${period}`;
 }
+
 // CONVERTING M TO KM
 const convertToKmh = (speedInMps: number): number => {
     return Math.round(speedInMps * 3.6);
@@ -77,10 +90,7 @@ window.onload = () => {
     // GETTING USER COORDINATES //
     const locationPromise = UserLocation.getCurrentLocation();
     locationPromise.then(location => {
-        console.log(location);
-        debugger
         getWeatherAndRender(location);
-        
     });
 }
 
@@ -95,8 +105,6 @@ const getWeatherAndRender = async (location: { latitude: number; longitude: numb
         // USER CITY
         // Get and display city name
         const city = await USER_LOCATION.getCityFromCoords(latitude, longitude);
-        console.log(city);
-        debugger
         USER_CITY.innerText = city || 'Unknown City';
 
         // Get and display forecast data
@@ -116,8 +124,12 @@ const getWeatherAndRender = async (location: { latitude: number; longitude: numb
         FIVE_DAY_FORECAST_DAY_DATE[4].innerText = `${formatDate(forecastData[38].dt_txt)}`;
 
         // Update hourly forecast
-        FIVE_HOUR_PARENT.innerHTML = "";
-        forecastData.forEach((e: { dt_txt: string; main: { temp: number }; wind: { speed: number } }) => {
+        // FIVE_HOUR_PARENT.innerHTML = "";
+        for (let i = 0; i < forecastData.length; i++) {
+            const e = forecastData[i];
+            if (i == 5) {
+                break;
+            }
             if (e.dt_txt.slice(0, 10) === getCurrentDate()) {
                 const hourly: string = `<div class="bg-sky-300 rounded-lg p-2 text-center theme-transition hourly-item flex flex-col justify-around">
                                     <div class="font-bold mb-1">${e.dt_txt.slice(11, 16)}</div>
@@ -126,7 +138,7 @@ const getWeatherAndRender = async (location: { latitude: number; longitude: numb
                                     </div>`;
                 FIVE_HOUR_PARENT.innerHTML += hourly;
             }
-        });
+        }
     } catch (error) {
         console.error('Error fetching city and forecast data:', error);
     }
@@ -208,9 +220,6 @@ const handleSearch = (event: Event) => {
         }
     })
 }
-
-// GETTING LOCATION FROM NAME
-
 
 
 
@@ -306,7 +315,11 @@ class NavbarHandler {
 // LOGOUT FUNCTIONALITY 
 USER_LOGOUT_BTN.addEventListener("click", () => {
     sessionStorage.clear()
-    window.location.href = "login.html";
+    document.getElementById("profile-modal")?.classList.add("hidden")
+    window.FlashMessage.success('Logged Out Successfully', { type: 'success', timeout: 2000 });
+    setTimeout(() => {
+        window.location.href = "login.html";
+    }, 3000);
 })
 
 // COUNT DOWN FOR NO USER
@@ -319,9 +332,9 @@ function countdown(seconds: number): void {
         }
         seconds--;
         if (seconds === -1) {
-            clearInterval(intervalId); // Stop the countdown
+            clearInterval(intervalId);
         }
-    }, 1000); // Execute every second
+    }, 1000);
 }
 // MODAL FOR NO USER
 function showAlert(className: string) {
@@ -334,10 +347,79 @@ function showAlert(className: string) {
         window.location.href = "login.html";
     }, 5000);
 }
-
-
-
 // Initialize navbar handler when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     new NavbarHandler();
+    // DELETING USER ACCOUNT START //
+    const dltmodal = document.querySelector(".delete-modal") as HTMLDivElement
+    const DeleteBtn = document.querySelector(".delete-btn")
+    DeleteBtn?.addEventListener("click", () => {
+        dltmodal.style.display = "block"
+    })
+    const confirmDeleteBtn = document.querySelector(".confirm-delete-btn") as HTMLHeadingElement
+    confirmDeleteBtn.addEventListener("click", () => {
+        dltmodal.style.display = "none"
+        window.FlashMessage.success('User Account Deleted Successfully', { type: 'success', timeout: 2000 });
+        setTimeout(() => {
+            sessionStorage.clear()
+            USER_API_SERVICE.DeleteUser(USER.id)
+            window.location.href = "login.html";
+        }, 3000);
+    })
+
+    const closeDeleteModal = document.querySelectorAll(".close-delete-modal") as NodeListOf<HTMLButtonElement>
+    closeDeleteModal.forEach((element: HTMLButtonElement) => {
+        element.addEventListener("click", () => {
+            dltmodal.style.display = "none"
+        })
+    })
+    // DELETING USER ACCOUNT END //
+    // EDITING USER START //
+    const editModal = document.querySelector(".edit-modal") as HTMLDivElement
+    const editBtn = document.querySelector(".edit-btn") as HTMLDivElement
+    editBtn.addEventListener("click", () => {
+        const firstName = document.querySelector(".edit-first-name") as HTMLInputElement
+        const lastName = document.querySelector(".edit-last-name") as HTMLInputElement
+        const email = document.querySelector(".edit-email") as HTMLInputElement
+        firstName.value = USER.first_name;
+        lastName.value = USER.last_name;
+        email.value = USER.email;
+        editModal.style.display = "block";
+    })
+
+    const closeEditModal = document.querySelector(".close-edit-modal") as HTMLButtonElement
+    closeEditModal.addEventListener("click", () => {
+        editModal.style.display = "none"
+    })
+    // EDITING USER END //
 });
+
+// UPDATING USER START //
+const handleUpdate = (event: Event) => {
+    event.preventDefault()
+    const eventTarget = event.target as HTMLFormElement;
+    const first_name = eventTarget[0] as HTMLInputElement;
+    const last_name = eventTarget[1] as HTMLInputElement;
+    const name: PatchUser = {
+        first_name: first_name.value,
+        last_name: last_name.value,
+    };
+    USER_API_SERVICE.PatchUser(name, USER.id)
+    USER.first_name = first_name.value
+    USER.last_name = last_name.value
+    console.log(USER);
+    debugger
+    sessionStorage.setItem("user", JSON.stringify(USER))
+}
+// UPDATING USER END//
+
+// USER PROFILE DETAILS START //
+const userPhoto = document.querySelector(".user-profile") as HTMLSpanElement
+userPhoto.innerHTML = USER.first_name.slice(0, 1).toUpperCase()
+const userName = document.querySelector(".user-name") as HTMLSpanElement
+const fullName = USER.first_name + " " + USER.last_name
+userName.innerText = fullName.slice(0, 10) + "..."
+const userEmail = document.querySelector(".user-email") as HTMLSpanElement
+console.log(USER.email);
+userEmail.innerText = USER.email.slice(0, 13) + "..."
+// USER PROFILE DETAILS END//

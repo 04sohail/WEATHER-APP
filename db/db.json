@@ -9,10 +9,17 @@
     },
     {
       "id": "1742204623683",
-      "first_name": "user1",
-      "last_name": "user1",
+      "first_name": "Jaiditya",
+      "last_name": "Bansal",
       "email": "user1@gmail.com",
       "password": "@User123"
+    },
+    {
+      "id": "1742286588252",
+      "first_name": "Brendan",
+      "last_name": "Eichhhh",
+      "email": "your.email+fakedata25193@gmail.com",
+      "password": "zMMQjHXS8FYe5AR"
     }
   ],
   "favourites": [

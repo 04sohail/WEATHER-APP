@@ -25,6 +25,36 @@
       <div class="bar bar8"></div>
     </div>
   </div>
+
+  <!-- USER FOUND MODAL  -->
+  <div class="fullScreen user-not-found">
+    <div class="middle">
+      <div class="min-h-screen w-screen">
+        <div id="default-modal" tabindex="-1" aria-hidden="true"
+          class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+          <div class=" left-[35%] relative p-4 w-[400px] max-w-2xl max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow-sm">
+              <!-- Modal header -->
+              <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-900 mssg">
+                  Already Logged In
+                </h3>
+              </div>
+              <!-- Modal body -->
+              <div class="p-4 md:p-5 space-y-4">
+                <p class="text-base leading-relaxed text-gray-500">
+                  Redirecting Back To Main Page In <span class="countdown"></span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <div class="flex min-h-screen">
     <!-- Weather Image Side -->
     <div class="hidden lg:block lg:w-1/2 relative overflow-hidden">
@@ -118,7 +148,7 @@
                   </span>
                   <input type="password" id="login-password" name="login-password"
                     class="pl-10 w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="••••••••" required>
+                    required>
                   <div class="flex justify-end">
                     <a href="#" class="text-sm text-blue-600 hover:underline">Forgot password?</a>
                   </div>
@@ -191,7 +221,7 @@
                   </span>
                   <input type="password" id="signup-password" name="signup-password"
                     class="pl-10 w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 signup"
-                    placeholder="••••••••" required>
+                    required>
                   <div id="signup-password-error" class="text-red-500 text-xs mt-1 hidden"></div>
                   <div class="mt-1 text-xs text-gray-500">Password must be at least 8 characters with 1 uppercase, 1
                     number</div>
@@ -207,7 +237,7 @@
                   </span>
                   <input type="password" id="confirm-password" name="confirm-password"
                     class="pl-10 w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 signup"
-                    placeholder="••••••••" required>
+                    required>
                   <div id="confirm-password-error" class="text-red-500 text-xs mt-1 hidden"></div>
                 </div>
               </div>
@@ -233,6 +263,8 @@
       </div>
     </div>
   </div>
+
+  <script src="../dist/src/ts/flash.min.js"></script>
   <script src="../dist/src/ts/apiservice.js"></script>
   <script src="../dist/src/ts/helping.js"></script>
   <script src="../dist/src/ts/login.js"></script>

@@ -1,3 +1,41 @@
+const user = JSON.parse(sessionStorage.getItem("user") as string)
+console.log(user);
+
+if (user) {
+    showAlert_login("user-not-found")
+    setTimeout(() => {
+        window.location.href = "main.html"
+    }, 4000)
+}
+
+// COUNT DOWN FOR NO USER
+function countdown_login(seconds: number): void {
+    const intervalId = setInterval(() => {
+        const countdownElement = document.querySelector(".countdown");
+        if (countdownElement) {
+            countdownElement.innerHTML = ""
+            countdownElement.innerHTML = seconds.toString();
+        }
+        seconds--;
+        if (seconds === -1) {
+            clearInterval(intervalId);
+        }
+    }, 1000);
+}
+// MODAL FOR NO USER
+function showAlert_login(className: string) {
+    const dom = document.querySelector(`.${className}`) as HTMLDivElement;
+    countdown_login(3)
+    dom?.classList.add("block")
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+        dom?.classList.remove(className, 'block');
+        window.location.href = "login.html";
+    }, 5000);
+}
+
+
+
 class FormValidator {
     private static instance: FormValidator;
 
@@ -29,7 +67,6 @@ class FormValidator {
         if (!password || password.trim() === '') {
             return { isValid: false, errorMessage: 'Password is required' };
         }
-
         return { isValid: true, errorMessage: '' };
     }
 
@@ -218,9 +255,12 @@ class LoginFormHandler extends FormHandler {
             }
             else {
                 const userData = API_RESPONSE[0];
+                const flash_check = true
                 console.log(userData);
                 window.location.href = "main.html";
                 sessionStorage.setItem("user", JSON.stringify(userData));
+                sessionStorage.setItem("flash_flag", JSON.stringify(flash_check))
+                // FlashMessage.success('Logged In Successfully', { type: 'success', timeout: 2000 });
             }
         }
     }

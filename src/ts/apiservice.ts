@@ -36,6 +36,44 @@ class UserApiService {
             console.error(error);
         }
     };
+    // DELETING USER
+    async DeleteUser(id: number): Promise<void> {
+        try {
+            this.LOADING_SCREEN.style.display = "block";
+            const API_RESPONSE: Response = await fetch(`${this.API_URL_USERS}/${id}`, {
+                method: "delete"
+            })
+            if (API_RESPONSE.ok) {
+                this.LOADING_SCREEN.style.display = "none";
+                window.FlashMessage.success('User Account Deleted Successfully', { type: 'success', timeout: 2000 });
+            }
+        } catch {
+            console.error("User Id Not Found")
+        }
+    }
+    // PATCHING USER TO API //
+    async PatchUser(user: PatchUser, endPoint: string) {
+        console.log(user.first_name);
+        console.log(user.last_name);
+        try {
+            this.LOADING_SCREEN.style.display = "block";
+            const API_RESPONSE = await fetch(`${this.API_URL_USERS}/${endPoint}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    "first_name": user.first_name,
+                    "last_name": user.last_name
+                }),
+            });
+            if (API_RESPONSE.ok) {
+                this.LOADING_SCREEN.style.display = "none";
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 }
 
 // GETTING USER LOCATION //
@@ -124,7 +162,6 @@ class getLatAndLon extends UserApiService {
             if (data && data.length > 0) {
                 const { lat, lon } = data[0]; // EXTRACT LATITUDE AND LONGITUDE
                 console.log(lat, lon);
-                debugger;
                 return { latitude: lat, longitude: lon };
             } else {
                 throw new Error("Location not found!");

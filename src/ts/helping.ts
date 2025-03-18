@@ -154,3 +154,14 @@ interface Location {
     latitude: number;
     longitude: number
 }
+
+interface Window {
+    FlashMessage: {
+        success: (message: string, options: { type: string; timeout: number }) => void;
+    };
+}
+
+interface PatchUser {
+    first_name: string,
+    last_name: string
+}
