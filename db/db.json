@@ -9,14 +9,14 @@
     },
     {
       "id": "1742204623683",
-      "first_name": "Jaiditya",
-      "last_name": "Bansal",
+      "first_name": "Brendan",
+      "last_name": "Eich",
       "email": "user1@gmail.com",
       "password": "@User123"
     },
     {
       "id": "1742286588252",
-      "first_name": "Brendan",
+      "first_name": "Brendaaaan",
       "last_name": "Eichhhh",
       "email": "your.email+fakedata25193@gmail.com",
       "password": "zMMQjHXS8FYe5AR"
@@ -24,10 +24,15 @@
   ],
   "favourites": [
     {
-      "id": "123123123",
-      "locations": [
-        "bhubaneswar",
-        "khordha"
+      "id": "1742204623683",
+      "favouriteList": [
+        {
+          "city": "Sahibzada Ajit Singh Nagar District",
+          "coordinates": [
+            30.6787,
+            76.7282
+          ]
+        }
       ]
     }
   ]

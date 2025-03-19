@@ -4,7 +4,7 @@ console.log(USER);
 
 
 if (!USER) {
-    window.location.href="login.html"
+    window.location.href = "login.html"
 }
 else if (flag_check === true) {
     window.FlashMessage.success('Logged In Successfully', { type: 'success', timeout: 2000 });
@@ -86,13 +86,7 @@ const convertToKmh = (speedInMps: number): number => {
     return Math.round(speedInMps * 3.6);
 };
 
-window.onload = () => {
-    // GETTING USER COORDINATES //
-    const locationPromise = UserLocation.getCurrentLocation();
-    locationPromise.then(location => {
-        getWeatherAndRender(location);
-    });
-}
+
 
 // COORDINATES AND RENDERING
 const getWeatherAndRender = async (location: { latitude: number; longitude: number }) => {
@@ -125,7 +119,7 @@ const getWeatherAndRender = async (location: { latitude: number; longitude: numb
 
         // Update hourly forecast
         // FIVE_HOUR_PARENT.innerHTML = "";
-        for (let i = 0; i < forecastData.length; i++) {
+        for (let i = 0; i < 6; i++) {
             const e = forecastData[i];
             if (i == 5) {
                 break;
@@ -208,33 +202,15 @@ const handleSearch = (event: Event) => {
     event.preventDefault()
     const event_target = event.target as HTMLFormElement
     const input_field = event_target[0] as HTMLInputElement
-    console.log(input_field.value);
 
     const locationn = GET_LAT_LON.getLatLonFromLocation(input_field.value)
     locationn.then((coords) => {
         if (coords) {
             const { latitude, longitude } = coords;
-            console.log(latitude);
-            console.log(longitude);
             getWeatherAndRender(coords);
         }
     })
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // NAVBAR //
 class NavbarHandler {
@@ -312,6 +288,7 @@ class NavbarHandler {
     }
 }
 
+
 // LOGOUT FUNCTIONALITY 
 USER_LOGOUT_BTN.addEventListener("click", () => {
     sessionStorage.clear()
@@ -350,6 +327,10 @@ function showAlert(className: string) {
 // Initialize navbar handler when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     new NavbarHandler();
+    const locationPromise = UserLocation.getCurrentLocation();
+    locationPromise.then(location => {
+        getWeatherAndRender(location);
+    });
     // DELETING USER ACCOUNT START //
     const dltmodal = document.querySelector(".delete-modal") as HTMLDivElement
     const DeleteBtn = document.querySelector(".delete-btn")
@@ -366,7 +347,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = "login.html";
         }, 3000);
     })
-
     const closeDeleteModal = document.querySelectorAll(".close-delete-modal") as NodeListOf<HTMLButtonElement>
     closeDeleteModal.forEach((element: HTMLButtonElement) => {
         element.addEventListener("click", () => {
@@ -386,12 +366,54 @@ document.addEventListener('DOMContentLoaded', () => {
         email.value = USER.email;
         editModal.style.display = "block";
     })
-
     const closeEditModal = document.querySelector(".close-edit-modal") as HTMLButtonElement
     closeEditModal.addEventListener("click", () => {
         editModal.style.display = "none"
     })
     // EDITING USER END //
+    // ADDING FAVOURITE START //
+    const favouriteBtn = document.querySelector('.favorite-btn') as HTMLButtonElement;
+    favouriteBtn.addEventListener('click', () => {
+        favouriteBtn.classList.forEach(async (className) => {
+            if (className === "text-white") {
+                const location = await locationPromise;
+                const { latitude, longitude } = location
+                const city = await USER_LOCATION.getCityFromCoords(latitude, longitude);
+                const user = await USER_API_SERVICE.GetSingleFavourite(`id=${USER.id}`)
+                console.log(user);
+                // console.log(user.favourites);
+                debugger
+                if (user?.length == 0) {
+                    const favourite: Favourite = {
+                        id: USER.id,
+                        favourites: [{
+                            "city": city,
+                            "coordinates": [latitude, longitude]
+                        }]
+                    }
+                    console.log("FAV", favourite);
+                    debugger
+                    USER_API_SERVICE.PostFavourite(favourite)
+                } else {
+                    debugger
+                    const favourite: { city: string; coordinates: number[] } = {
+                        "city": "delhi",
+                        "coordinates": [1, 2]
+                    }
+                    console.log(favourite);
+                    debugger
+                    USER_API_SERVICE.PatchFavourite(favourite, USER.id)
+                }
+                favouriteBtn.classList.remove("text-white")
+                favouriteBtn.classList.add("text-yellow-500")
+                return
+            } else if (className === "text-yellow-500") {
+                favouriteBtn.classList.add("text-white")
+                favouriteBtn.classList.remove("text-yellow-500")
+            }
+        })
+    });
+    // ADDING FAVOURITE END //
 });
 
 // UPDATING USER START //
@@ -407,8 +429,6 @@ const handleUpdate = (event: Event) => {
     USER_API_SERVICE.PatchUser(name, USER.id)
     USER.first_name = first_name.value
     USER.last_name = last_name.value
-    console.log(USER);
-    debugger
     sessionStorage.setItem("user", JSON.stringify(USER))
 }
 // UPDATING USER END//
@@ -420,6 +440,5 @@ const userName = document.querySelector(".user-name") as HTMLSpanElement
 const fullName = USER.first_name + " " + USER.last_name
 userName.innerText = fullName.slice(0, 10) + "..."
 const userEmail = document.querySelector(".user-email") as HTMLSpanElement
-console.log(USER.email);
 userEmail.innerText = USER.email.slice(0, 13) + "..."
 // USER PROFILE DETAILS END//

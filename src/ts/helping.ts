@@ -165,3 +165,8 @@ interface PatchUser {
     first_name: string,
     last_name: string
 }
+
+interface Favourite{
+    id:string,
+    favourites:Array<Object>
+}

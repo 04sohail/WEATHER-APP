@@ -1,6 +1,7 @@
 class UserApiService {
     API_URL: string = "http://localhost:3000";
     API_URL_USERS: string = "http://localhost:3000/users"
+    API_URL_FAVOURITE: string = "http://localhost:3000/favourites"
     LOADING_SCREEN: HTMLElement = document.querySelector(".fullScreen") as HTMLDivElement;
     WEATHER_API_KEY: string = "492893deed7dcba52a4ea95768802f3a";
     // GET SINGLE USER
@@ -18,8 +19,23 @@ class UserApiService {
             return undefined;
         }
     };
+    // GET SINGLE USER
+    async GetSingleFavourite(endPoint: string): Promise<Object[] | undefined> {
+        try {
+            this.LOADING_SCREEN.style.display = "block";
+            const API_response = await fetch(`${this.API_URL_FAVOURITE}?${endPoint}`);
+            if (API_response.ok) {
+                this.LOADING_SCREEN.style.display = "none";
+            }
+            const user: Object[] = await API_response.json();
+            return user;
+        } catch (error) {
+            console.error(error);
+            return undefined;
+        }
+    };
     // POSTING USER TO API 
-    async PostUser(user: User, endPoint: string | null): Promise<void> {
+    async PostUser(user: any, endPoint: string | null): Promise<void> {
         try {
             this.LOADING_SCREEN.style.display = "block";
             const API_RESPONSE: Response = await fetch(`${this.API_URL}/${endPoint}`, {
@@ -28,6 +44,24 @@ class UserApiService {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(user),
+            });
+            if (API_RESPONSE.ok) {
+                this.LOADING_SCREEN.style.display = "none";
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    // POSTING USER TO API 
+    async PostFavourite(favourite: any): Promise<void> {
+        try {
+            this.LOADING_SCREEN.style.display = "block";
+            const API_RESPONSE: Response = await fetch(`${this.API_URL_FAVOURITE}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(favourite),
             });
             if (API_RESPONSE.ok) {
                 this.LOADING_SCREEN.style.display = "none";
@@ -53,8 +87,6 @@ class UserApiService {
     }
     // PATCHING USER TO API //
     async PatchUser(user: PatchUser, endPoint: string) {
-        console.log(user.first_name);
-        console.log(user.last_name);
         try {
             this.LOADING_SCREEN.style.display = "block";
             const API_RESPONSE = await fetch(`${this.API_URL_USERS}/${endPoint}`, {
@@ -74,6 +106,41 @@ class UserApiService {
             console.error(error);
         }
     };
+    // PATCHING FAVOURITE TO API //
+    async PatchFavourite(favourite: { city: string; coordinates: number[] }, endPoint: string) {
+        try {
+            this.LOADING_SCREEN.style.display = "block";
+            const user = await this.GetSingleFavourite(`id=${endPoint}`)
+            const updatedFavourites = user[0]
+            updatedFavourites.favouriteList.push(favourite)
+            console.log(updatedFavourites);
+            debugger
+
+
+            // Send PATCH request
+            const patchResponse = await fetch(apiUrl, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ favouriteList: updatedFavourites }),
+            });
+
+            // Handle PATCH response
+            if (patchResponse.ok) {
+                console.log("Favourite added successfully.");
+            } else {
+                const errorData = await patchResponse.json();
+                console.error("Failed to update favouriteList:", errorData);
+            }
+        } catch (error) {
+            console.error("Error adding to favouriteList:", error);
+        } finally {
+            // Hide loading screen (optional)
+            this.LOADING_SCREEN.style.display = "none";
+        }
+    }
+
 }
 
 // GETTING USER LOCATION //
@@ -161,7 +228,6 @@ class getLatAndLon extends UserApiService {
             const data: GeoLocation[] = await response.json();
             if (data && data.length > 0) {
                 const { lat, lon } = data[0]; // EXTRACT LATITUDE AND LONGITUDE
-                console.log(lat, lon);
                 return { latitude: lat, longitude: lon };
             } else {
                 throw new Error("Location not found!");
@@ -172,14 +238,3 @@ class getLatAndLon extends UserApiService {
         }
     }
 }
-
-// EXAMPLE USAGE
-new getLatAndLon().getLatLonFromLocation("dubai")
-    .then((coords) => {
-        if (coords) {
-            console.log(`Latitude: ${coords.latitude}, Longitude: ${coords.longitude}`);
-        } else {
-            console.log("Coordinates could not be retrieved.");
-        }
-    })
-    .catch((error) => console.error(error));
