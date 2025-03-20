@@ -22,18 +22,5 @@
       "password": "zMMQjHXS8FYe5AR"
     }
   ],
-  "favourites": [
-    {
-      "id": "1742204623683",
-      "favouriteList": [
-        {
-          "city": "Sahibzada Ajit Singh Nagar District",
-          "coordinates": [
-            30.6787,
-            76.7282
-          ]
-        }
-      ]
-    }
-  ]
+  "favourites": []
 }

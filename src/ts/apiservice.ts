@@ -52,8 +52,8 @@ class UserApiService {
             console.error(error);
         }
     };
-    // POSTING USER TO API 
-    async PostFavourite(favourite: any): Promise<void> {
+    // POSTING FAV TO API 
+    async PostFavourite(favouriteList: any): Promise<void> {
         try {
             this.LOADING_SCREEN.style.display = "block";
             const API_RESPONSE: Response = await fetch(`${this.API_URL_FAVOURITE}`, {
@@ -61,7 +61,9 @@ class UserApiService {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(favourite),
+                body: JSON.stringify(
+                    favouriteList
+                ),
             });
             if (API_RESPONSE.ok) {
                 this.LOADING_SCREEN.style.display = "none";
@@ -107,23 +109,23 @@ class UserApiService {
         }
     };
     // PATCHING FAVOURITE TO API //
-    async PatchFavourite(favourite: { city: string; coordinates: number[] }, endPoint: string) {
+    async PatchFavourite(favourites: { city: string | undefined; coordinates: number[] }, endPoint: string) {
         try {
             this.LOADING_SCREEN.style.display = "block";
             const user = await this.GetSingleFavourite(`id=${endPoint}`)
-            const updatedFavourites = user[0]
-            updatedFavourites.favouriteList.push(favourite)
+            const updatedFavourites = user[0].favourites
             console.log(updatedFavourites);
             debugger
-
-
+            updatedFavourites.push(favourites)
+            console.log(updatedFavourites);
+            debugger
             // Send PATCH request
-            const patchResponse = await fetch(apiUrl, {
+            const patchResponse = await fetch(`${this.API_URL_FAVOURITE}/${endPoint}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ favouriteList: updatedFavourites }),
+                body: JSON.stringify({ favourites: updatedFavourites }),
             });
 
             // Handle PATCH response
@@ -140,7 +142,6 @@ class UserApiService {
             this.LOADING_SCREEN.style.display = "none";
         }
     }
-
 }
 
 // GETTING USER LOCATION //

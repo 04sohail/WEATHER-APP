@@ -151,7 +151,7 @@ interface DropdownElements {
 }
 
 interface Location {
-    latitude: number;
+    latitude: number,
     longitude: number
 }
 

@@ -34,8 +34,14 @@ const MAIN_TEMP_DESCRIPTION = document.querySelector(".main-temp-description") a
 const USER_LOGOUT_BTN = document.querySelector(".user-logout-btn") as HTMLAnchorElement;
 const MAIN_SEARCH_BAR = document.querySelector("#main-navbar") as HTMLInputElement
 let FIVE_HOUR_PARENT = document.querySelector(".hourly-parent") as HTMLDivElement;
+const favouriteBtn = document.querySelector('.favorite-btn') as HTMLButtonElement;
 
-
+// FOR FAVOURITE ADDING AND UPDATING //
+let mainCity: string | undefined = ""
+let mainLocation = {
+    latitude: 0,
+    longitude: 0
+}
 // GETTING CURRENT DATE
 function getCurrentDate() {
     const date = new Date();
@@ -95,11 +101,15 @@ const getWeatherAndRender = async (location: { latitude: number; longitude: numb
         // Get coordinates
         const coords = await location;
         const { latitude, longitude } = coords;
-
+        console.log(latitude, longitude);
+        mainLocation.latitude = latitude
+        mainLocation.longitude = longitude
         // USER CITY
         // Get and display city name
         const city = await USER_LOCATION.getCityFromCoords(latitude, longitude);
+        mainCity = city
         USER_CITY.innerText = city || 'Unknown City';
+        checkFavouriteOnLoad()
 
         // Get and display forecast data
         const forecastResponse = await WEATHER_SERVICE.GetFiveDayForecast(latitude, longitude);
@@ -118,7 +128,7 @@ const getWeatherAndRender = async (location: { latitude: number; longitude: numb
         FIVE_DAY_FORECAST_DAY_DATE[4].innerText = `${formatDate(forecastData[38].dt_txt)}`;
 
         // Update hourly forecast
-        // FIVE_HOUR_PARENT.innerHTML = "";
+        FIVE_HOUR_PARENT.innerHTML = "";
         for (let i = 0; i < 6; i++) {
             const e = forecastData[i];
             if (i == 5) {
@@ -202,11 +212,9 @@ const handleSearch = (event: Event) => {
     event.preventDefault()
     const event_target = event.target as HTMLFormElement
     const input_field = event_target[0] as HTMLInputElement
-
     const locationn = GET_LAT_LON.getLatLonFromLocation(input_field.value)
     locationn.then((coords) => {
         if (coords) {
-            const { latitude, longitude } = coords;
             getWeatherAndRender(coords);
         }
     })
@@ -372,40 +380,42 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     // EDITING USER END //
     // ADDING FAVOURITE START //
-    const favouriteBtn = document.querySelector('.favorite-btn') as HTMLButtonElement;
-    favouriteBtn.addEventListener('click', () => {
+    favouriteBtn.addEventListener('click', (event) => {
+        event.preventDefault()
         favouriteBtn.classList.forEach(async (className) => {
             if (className === "text-white") {
-                const location = await locationPromise;
-                const { latitude, longitude } = location
-                const city = await USER_LOCATION.getCityFromCoords(latitude, longitude);
+                favouriteBtn.classList.remove("text-white")
+                favouriteBtn.classList.add("text-yellow-500")
                 const user = await USER_API_SERVICE.GetSingleFavourite(`id=${USER.id}`)
                 console.log(user);
-                // console.log(user.favourites);
-                debugger
+                user[0].favourites.forEach(element => {
+                    if (mainCity === element.city) {
+                        console.log("CITY EXISTS");
+                        return
+                    }
+                });
                 if (user?.length == 0) {
+                    if (user.city === mainCity) {
+                        console.log("city ALREADY EXITS");
+                    }
                     const favourite: Favourite = {
                         id: USER.id,
                         favourites: [{
-                            "city": city,
-                            "coordinates": [latitude, longitude]
+                            "city": mainCity,
+                            "coordinates": [mainLocation.latitude, mainLocation.longitude]
                         }]
                     }
                     console.log("FAV", favourite);
-                    debugger
                     USER_API_SERVICE.PostFavourite(favourite)
                 } else {
-                    debugger
-                    const favourite: { city: string; coordinates: number[] } = {
-                        "city": "delhi",
-                        "coordinates": [1, 2]
+                    const favourite: { city: string | undefined; coordinates: number[] } = {
+                        "city": mainCity,
+                        "coordinates": [mainLocation.latitude, mainLocation.longitude]
                     }
                     console.log(favourite);
-                    debugger
                     USER_API_SERVICE.PatchFavourite(favourite, USER.id)
                 }
-                favouriteBtn.classList.remove("text-white")
-                favouriteBtn.classList.add("text-yellow-500")
+
                 return
             } else if (className === "text-yellow-500") {
                 favouriteBtn.classList.add("text-white")
@@ -415,6 +425,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     // ADDING FAVOURITE END //
 });
+
+// Function to check if the current location is a favorite during page load
+const checkFavouriteOnLoad = async () => {
+    try {
+        const user = await USER_API_SERVICE.GetSingleFavourite(`id=${USER.id}`);
+        if (user.length > 0) {
+            const userFavourites = user[0].favourites;
+            const locationExists = userFavourites.some(
+                (fav: { city: string; coordinates: number[] }) => {
+                    return fav.city === mainCity
+                }
+            );
+            debugger
+            if (locationExists) {
+                debugger
+                favouriteBtn.classList.remove("text-white");
+                favouriteBtn.classList.add("text-yellow-500");
+            } else {
+                debugger
+                favouriteBtn.classList.add("text-white");
+                favouriteBtn.classList.remove("text-yellow-500");
+            }
+        }
+    } catch (error) {
+        console.error("Error checking favorite on load:", error);
+    }
+};
+
+
+
+
+
+
 
 // UPDATING USER START //
 const handleUpdate = (event: Event) => {
